@@ -57,8 +57,6 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
     read_serializer_class = IssueReadSerializer
     write_serializer_class = IssueCreateSerializer  # default for create
 
-    permission_classes = [AllowAny]
-
     def get_serializer_class(self):
         """
         Explicit serializer routing for create vs update.

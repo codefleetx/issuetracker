@@ -58,4 +58,3 @@ class IssueReadViewSet(BaseReadOnlyViewSet):
     )
 
     read_serializer_class = IssueReadSerializer
-    permission_classes = [AllowAny]

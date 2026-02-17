@@ -19,7 +19,5 @@ class LabelCRUDViewSet(BaseCRUDViewSet):
     read_serializer_class = LabelReadSerializer
     write_serializer_class = LabelCreateSerializer
 
-    permission_classes = [AllowAny]
-
     def perform_destroy(self, instance):
         instance.soft_delete()

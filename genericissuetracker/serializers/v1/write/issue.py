@@ -54,7 +54,7 @@ class IssueCreateSerializer(BaseIssueWriteSerializer):
         
         Identity fields are already injected in base validation.
         """
-        return Issue.object.create(**validated_data)
+        return Issue.objects.create(**validated_data)
 
 
 # ----------------------------------------------------------------------
@@ -70,7 +70,7 @@ class IssueUpdateSerializer(BaseIssueWriteSerializer):
         - Status changes restricted.
     """
     
-    class Meta(BaseIssueWriteSerializer):
+    class Meta(BaseIssueWriteSerializer.Meta):
         model = Issue
         fields = BaseIssueWriteSerializer.Meta.fields
     

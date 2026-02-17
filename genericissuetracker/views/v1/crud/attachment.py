@@ -27,7 +27,5 @@ class AttachmentCRUDViewSet(BaseCRUDViewSet):
     read_serializer_class = IssueAttachmentReadSerializer
     write_serializer_class = IssueAttachmentUploadSerializer
 
-    permission_classes = [AllowAny]
-
     def perform_destroy(self, instance):
         instance.soft_delete()

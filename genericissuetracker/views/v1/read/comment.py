@@ -26,4 +26,3 @@ from genericissuetracker.views.v1.base import BaseReadOnlyViewSet
 class CommentReadViewSet(BaseReadOnlyViewSet):
     queryset = IssueComment.objects.select_related("issue").all()
     read_serializer_class = IssueCommentReadSerializer
-    permission_classes = [AllowAny]

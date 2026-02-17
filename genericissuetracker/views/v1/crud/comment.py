@@ -29,7 +29,5 @@ class CommentCRUDViewSet(BaseCRUDViewSet):
     read_serializer_class = IssueCommentReadSerializer
     write_serializer_class = IssueCommentCreateSerializer
 
-    permission_classes = [AllowAny]
-
     def perform_destroy(self, instance):
         instance.soft_delete()

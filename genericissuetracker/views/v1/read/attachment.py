@@ -17,4 +17,3 @@ from genericissuetracker.views.v1.base import BaseReadOnlyViewSet
 class AttachmentReadViewSet(BaseReadOnlyViewSet):
     queryset = IssueAttachment.objects.select_related("issue").all()
     read_serializer_class = IssueAttachmentReadSerializer
-    permission_classes = [AllowAny]
