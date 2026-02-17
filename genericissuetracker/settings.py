@@ -74,6 +74,28 @@ DEFAULTS = {
     # Used for validation only. Storage backend enforces physical limits.
     # --------------------------------------------------------------
     "MAX_ATTACHMENT_SIZE_MB": 10,
+    
+    # --------------------------------------------------------------
+    # Permission Controls
+    # --------------------------------------------------------------
+    # List of dotted permission class paths to apply as default
+    # permission classes for all Generic Issue Tracker endpoints.
+    #
+    # Example override in host project:
+    #
+    # GENERIC_ISSUETRACKER_DEFAULT_PERMISSION_CLASSES = [
+    #     "rest_framework.permissions.IsAuthenticated",
+    # ]
+    #
+    # Default behavior:
+    #     Fully open API (AllowAny)
+    #
+    # The library dynamically resolves these dotted paths into
+    # actual DRF permission classes.
+    # --------------------------------------------------------------
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
 }
 
 

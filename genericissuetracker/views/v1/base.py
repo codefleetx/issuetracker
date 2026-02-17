@@ -16,6 +16,7 @@ Design Principles
 - No business logic in views.
 - Explicit serializer separation.
 - Deterministic serializer selection.
+- Configurable permission architecture.
 - No dynamic schema behavior.
 - DRY queryset handling.
 
@@ -31,10 +32,15 @@ Rules Enforced
 3. Serializer selection must never depend on runtime
    request data other than action name.
 
-4. No implicit fallback serializers.
+4. Permission classes default to configured setting
+   unless explicitly overridden in ViewSet.
 """
 
 from rest_framework import viewsets
+
+from genericissuetracker.services.permissions import (
+    resolve_default_permission_classes,
+)
 
 
 # ----------------------------------------------------------------------
@@ -50,6 +56,7 @@ class BaseReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     read_serializer_class = None
+    permission_classes = []
 
     def get_serializer_class(self):
         """
@@ -63,6 +70,22 @@ class BaseReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
             )
 
         return self.read_serializer_class
+
+    def get_permissions(self):
+        """
+        Resolve permission classes.
+
+        Priority:
+            1. Explicit `permission_classes` defined on ViewSet
+            2. Configured DEFAULT_PERMISSION_CLASSES
+        """
+        print(">>> USING CUSTOM PERMISSION RESOLVER <<<")
+        
+        if "permission_classes" in self.__class__.__dict__:
+            return [permission() for permission in self.permission_classes]
+
+        default_permissions = resolve_default_permission_classes()
+        return [permission() for permission in default_permissions]
 
 
 # ----------------------------------------------------------------------
@@ -80,19 +103,19 @@ class BaseCRUDViewSet(viewsets.ModelViewSet):
     Serializer Selection Rules:
         - list/retrieve → read_serializer_class
         - create/update/partial_update/destroy → write_serializer_class
+
+    Permission Rules:
+        - Uses configured default permissions
+          unless explicitly overridden.
     """
 
     read_serializer_class = None
     write_serializer_class = None
+    permission_classes = []
 
     def get_serializer_class(self):
         """
         Deterministic serializer selection based on action.
-
-        This avoids:
-            • dynamic schema switching
-            • request-based serializer changes
-            • OpenAPI ambiguity
         """
         if self.action in ["list", "retrieve"]:
             if not self.read_serializer_class:
@@ -108,7 +131,20 @@ class BaseCRUDViewSet(viewsets.ModelViewSet):
                 )
             return self.write_serializer_class
 
-        # Explicit failure for unknown actions
         raise AssertionError(
             f"Unhandled action '{self.action}' in {self.__class__.__name__}."
         )
+
+    def get_permissions(self):
+        """
+        Resolve permission classes.
+
+        Priority:
+            1. Explicit `permission_classes` defined on ViewSet
+            2. Configured DEFAULT_PERMISSION_CLASSES
+        """
+        if getattr(self, "permission_classes", None):
+            return [permission() for permission in self.permission_classes]
+
+        default_permissions = resolve_default_permission_classes()
+        return [permission() for permission in default_permissions]

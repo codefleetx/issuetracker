@@ -15,4 +15,3 @@ from genericissuetracker.views.v1.base import BaseReadOnlyViewSet
 class LabelReadViewSet(BaseReadOnlyViewSet):
     queryset = Label.objects.all()
     read_serializer_class = LabelReadSerializer
-    permission_classes = [AllowAny]

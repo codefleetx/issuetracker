@@ -83,3 +83,9 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Generic Issue Tracker API (Dev)",
     "VERSION": "v1",
 }
+
+GENERIC_ISSUETRACKER_DEFAULT_PERMISSION_CLASSES = [
+    "rest_framework.permissions.IsAuthenticated",
+]
+
+print(">>> PERMISSION OVERRIDE LOADED <<<")
