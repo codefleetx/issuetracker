@@ -38,6 +38,8 @@ Important Architecture Decisions
 from django.db import models
 
 from .base import BaseModel
+from django.db import transaction
+from django.db.models import Max
 
 
 # ----------------------------------------------------------------------
@@ -159,6 +161,16 @@ class Issue(BaseModel):
         related_name="issues",
         help_text="Categorization labels assigned to this issue.",
     )
+    
+    # ------------------------------------------------------------------
+    # HUMAN-FRIENDLY IDENTIFIER (PATCH v0.4.1)
+    # ------------------------------------------------------------------
+    issue_number = models.BigIntegerField(
+        unique=True,
+        db_index=True,
+        editable=False,
+        help_text="Sequential human-friendly identifier for this issue.",
+    )
 
     # ------------------------------------------------------------------
     # META
@@ -177,3 +189,33 @@ class Issue(BaseModel):
     # ------------------------------------------------------------------
     def __str__(self) -> str:
         return f"{self.title} ({self.status})"
+    
+    # ------------------------------------------------------------------
+    # AUTO ASSIGN ISSUE NUMBER (PATCH v0.4.1)
+    # ------------------------------------------------------------------
+    def save(self, *args, **kwargs):
+        """
+        Automatically assign sequential issue_number on first save.
+
+        Concurrency Safe:
+        -----------------
+        Uses database transaction + MAX() aggregation to ensure
+        no duplicate issue numbers are generated.
+
+        This does NOT rely on database-specific sequences,
+        keeping portability across SQLite, PostgreSQL, MySQL.
+
+        issue_number is immutable once assigned.
+        """
+        if self.issue_number is None:
+            with transaction.atomic():
+                last_number = (
+                    Issue.all_objects.aggregate(
+                        max_number=Max("issue_number")
+                    )["max_number"]
+                    or 0
+                )
+                self.issue_number = last_number + 1
+
+        super().save(*args, **kwargs)
+

@@ -51,6 +51,7 @@ class BaseIssueWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = [
+            "issue_number",
             "title",
             "description",
             "status",
