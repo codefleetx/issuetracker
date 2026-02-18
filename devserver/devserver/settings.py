@@ -76,7 +76,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # DRF Configuration
 # ------------------------------------------------------------------
 REST_FRAMEWORK = {
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",    
 }
 
 SPECTACULAR_SETTINGS = {
@@ -84,8 +84,11 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "v1",
 }
 
-GENERIC_ISSUETRACKER_DEFAULT_PERMISSION_CLASSES = [
-    "rest_framework.permissions.IsAuthenticated",
-]
+# In case of no pagination, set 'GENERIC_ISSUETRACKER_DEFAULT_PAGINATION_CLASS' to None
+GENERIC_ISSUETRACKER_DEFAULT_PAGINATION_CLASS = "rest_framework.pagination.PageNumberPagination"
+GENERIC_ISSUETRACKER_PAGE_SIZE = 10
 
-print(">>> PERMISSION OVERRIDE LOADED <<<")
+GENERIC_ISSUETRACKER_DEFAULT_PERMISSION_CLASSES = [
+    # "rest_framework.permissions.IsAuthenticated",
+    "rest_framework.permissions.AllowAny",  # Uncomment for Test purpose only
+]

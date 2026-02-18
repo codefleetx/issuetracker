@@ -9,7 +9,7 @@ Exposes:
     • DELETE /api/v1/attachments/{id}/
 """
 
-from rest_framework.permissions import AllowAny
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from genericissuetracker.models import IssueAttachment
 from genericissuetracker.serializers.v1.read.attachment import (
@@ -21,11 +21,35 @@ from genericissuetracker.serializers.v1.write.attachment import (
 from genericissuetracker.views.v1.base import BaseCRUDViewSet
 
 
+@extend_schema_view(
+    list=extend_schema(
+        operation_id="attachment_crud_list",
+        tags=["Attachment"],
+        summary="List attachments (write-capable endpoint)",
+    ),
+    retrieve=extend_schema(
+        operation_id="attachment_crud_retrieve",
+        tags=["Attachment"],
+        summary="Retrieve attachment (write-capable endpoint)",
+    ),
+    create=extend_schema(
+        operation_id="attachment_create",
+        tags=["Attachment"],
+        summary="Upload attachment",
+    ),
+    destroy=extend_schema(
+        operation_id="attachment_delete",
+        tags=["Attachment"],
+        summary="Soft delete attachment",
+    ),
+)
 class AttachmentCRUDViewSet(BaseCRUDViewSet):
     queryset = IssueAttachment.objects.all()
 
     read_serializer_class = IssueAttachmentReadSerializer
     write_serializer_class = IssueAttachmentUploadSerializer
+
+    http_method_names = ["get", "post", "delete"]
 
     def perform_destroy(self, instance):
         instance.soft_delete()

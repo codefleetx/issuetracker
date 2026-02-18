@@ -96,8 +96,50 @@ DEFAULTS = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
-}
+    
+    # --------------------------------------------------------------
+    # Pagination Controls
+    # --------------------------------------------------------------
+    # Default pagination class (dotted path).
+    #
+    # Example override:
+    #
+    # GENERIC_ISSUETRACKER_DEFAULT_PAGINATION_CLASS =
+    #     "rest_framework.pagination.PageNumberPagination"
+    #
+    # GENERIC_ISSUETRACKER_PAGE_SIZE = 20
+    #
+    # If DEFAULT_PAGINATION_CLASS is None:
+    #     Pagination is disabled.
+    # --------------------------------------------------------------
+    "DEFAULT_PAGINATION_CLASS": 
+        "rest_framework.pagination.PageNumberPagination",
 
+    # Default page size for PageNumberPagination.
+    # Ignored if pagination disabled.
+    "PAGE_SIZE": 10,
+    
+    # --------------------------------------------------------------
+    # Filtering Controls
+    # --------------------------------------------------------------
+    # Default DRF filter backends (dotted paths).
+    #
+    # Example override:
+    #
+    # GENERIC_ISSUETRACKER_DEFAULT_FILTER_BACKENDS = [
+    #     "rest_framework.filters.SearchFilter",
+    #     "rest_framework.filters.OrderingFilter",
+    # ]
+    #
+    # If empty list:
+    #     Filtering disabled.
+    # --------------------------------------------------------------
+    "DEFAULT_FILTER_BACKENDS": [
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
+
+}
 
 # ----------------------------------------------------------------------
 # SAFE SETTING ACCESSOR

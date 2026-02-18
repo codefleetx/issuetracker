@@ -17,6 +17,7 @@ Design Principles
 - Explicit serializer separation.
 - Deterministic serializer selection.
 - Configurable permission architecture.
+- Configurable pagination architecture.
 - No dynamic schema behavior.
 - DRY queryset handling.
 
@@ -34,10 +35,18 @@ Rules Enforced
 
 4. Permission classes default to configured setting
    unless explicitly overridden in ViewSet.
+
+5. Pagination defaults to configured setting
+   unless explicitly overridden in ViewSet.
 """
 
 from rest_framework import viewsets
 
+from genericissuetracker.services.filtering import resolve_filter_backends
+from genericissuetracker.services.pagination import (
+    resolve_page_size,
+    resolve_pagination_class,
+)
 from genericissuetracker.services.permissions import (
     resolve_default_permission_classes,
 )
@@ -56,14 +65,11 @@ class BaseReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     read_serializer_class = None
-    permission_classes = []
 
+    # ------------------------------------------------------------------
+    # Serializer Handling
+    # ------------------------------------------------------------------
     def get_serializer_class(self):
-        """
-        Always return the read serializer.
-
-        Enforces deterministic schema.
-        """
         if not self.read_serializer_class:
             raise AssertionError(
                 "Read-only ViewSet must define `read_serializer_class`."
@@ -71,21 +77,60 @@ class BaseReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
 
         return self.read_serializer_class
 
+    # ------------------------------------------------------------------
+    # Permission Handling
+    # ------------------------------------------------------------------
     def get_permissions(self):
-        """
-        Resolve permission classes.
-
-        Priority:
-            1. Explicit `permission_classes` defined on ViewSet
-            2. Configured DEFAULT_PERMISSION_CLASSES
-        """
-        print(">>> USING CUSTOM PERMISSION RESOLVER <<<")
-        
+        # Explicit override on subclass
         if "permission_classes" in self.__class__.__dict__:
             return [permission() for permission in self.permission_classes]
 
         default_permissions = resolve_default_permission_classes()
         return [permission() for permission in default_permissions]
+    
+    # ------------------------------------------------------------------
+    # Pagination Handling
+    # ------------------------------------------------------------------
+    def get_pagination_class(self):
+        if "pagination_class" in self.__class__.__dict__:
+            return self.pagination_class
+
+        return resolve_pagination_class()
+
+    def paginate_queryset(self, queryset):
+        pagination_class = self.get_pagination_class()
+
+        if pagination_class is None:
+            return None
+
+        paginator = pagination_class()
+        paginator.page_size = resolve_page_size()
+
+        self._paginator = paginator
+        return paginator.paginate_queryset(queryset, self.request, view=self)
+
+    # ------------------------------------------------------------------
+    # Filtering Handling
+    # ------------------------------------------------------------------
+    def get_filter_backends(self):
+        if "filter_backends" in self.__class__.__dict__:
+            return self.filter_backends
+
+        return resolve_filter_backends()
+    
+    def filter_queryset(self, queryset):
+        """
+        Apply configured filter backends deterministically.
+        """
+        if "filter_backends" in self.__class__.__dict__:
+            backends = self.filter_backends
+        else:
+            backends = resolve_filter_backends()
+
+        for backend in backends:
+            queryset = backend().filter_queryset(self.request, queryset, self)
+
+        return queryset
 
 
 # ----------------------------------------------------------------------
@@ -99,31 +144,15 @@ class BaseCRUDViewSet(viewsets.ModelViewSet):
         - Must define `read_serializer_class`
         - Must define `write_serializer_class`
         - Must define `queryset`
-
-    Serializer Selection Rules:
-        - list/retrieve → read_serializer_class
-        - create/update/partial_update/destroy → write_serializer_class
-
-    Permission Rules:
-        - Uses configured default permissions
-          unless explicitly overridden.
     """
 
     read_serializer_class = None
     write_serializer_class = None
-    permission_classes = []
-
+    
+    # ------------------------------------------------------------------
+    # Serializer Handling
+    # ------------------------------------------------------------------
     def get_serializer_class(self):
-        """
-        Deterministic serializer selection based on action.
-        """
-        if self.action in ["list", "retrieve"]:
-            if not self.read_serializer_class:
-                raise AssertionError(
-                    "CRUD ViewSet must define `read_serializer_class`."
-                )
-            return self.read_serializer_class
-
         if self.action in ["create", "update", "partial_update", "destroy"]:
             if not self.write_serializer_class:
                 raise AssertionError(
@@ -131,20 +160,63 @@ class BaseCRUDViewSet(viewsets.ModelViewSet):
                 )
             return self.write_serializer_class
 
-        raise AssertionError(
-            f"Unhandled action '{self.action}' in {self.__class__.__name__}."
-        )
+        if not self.read_serializer_class:
+            raise AssertionError(
+                "CRUD ViewSet must define `read_serializer_class`."
+            )
 
+        return self.read_serializer_class
+
+    # ------------------------------------------------------------------
+    # Permission Handling
+    # ------------------------------------------------------------------
     def get_permissions(self):
-        """
-        Resolve permission classes.
-
-        Priority:
-            1. Explicit `permission_classes` defined on ViewSet
-            2. Configured DEFAULT_PERMISSION_CLASSES
-        """
-        if getattr(self, "permission_classes", None):
+        if "permission_classes" in self.__class__.__dict__:
             return [permission() for permission in self.permission_classes]
 
         default_permissions = resolve_default_permission_classes()
         return [permission() for permission in default_permissions]
+
+    # ------------------------------------------------------------------
+    # Pagination Handling
+    # ------------------------------------------------------------------
+    def get_pagination_class(self):
+        if "pagination_class" in self.__class__.__dict__:
+            return self.pagination_class
+
+        return resolve_pagination_class()
+
+    def paginate_queryset(self, queryset):
+        pagination_class = self.get_pagination_class()
+
+        if pagination_class is None:
+            return None
+
+        paginator = pagination_class()
+        paginator.page_size = resolve_page_size()
+
+        self._paginator = paginator
+        return paginator.paginate_queryset(queryset, self.request, view=self)
+
+    # ------------------------------------------------------------------
+    # Filtering Handling
+    # ------------------------------------------------------------------
+    def get_filter_backends(self):
+        if "filter_backends" in self.__class__.__dict__:
+            return self.filter_backends
+
+        return resolve_filter_backends()
+    
+    def filter_queryset(self, queryset):
+        """
+        Apply configured filter backends deterministically.
+        """
+        if "filter_backends" in self.__class__.__dict__:
+            backends = self.filter_backends
+        else:
+            backends = resolve_filter_backends()
+
+        for backend in backends:
+            queryset = backend().filter_queryset(self.request, queryset, self)
+
+        return queryset
