@@ -1,5 +1,4 @@
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 def backfill_issue_numbers(apps, schema_editor):
