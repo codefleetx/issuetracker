@@ -20,16 +20,9 @@ Design Principles
 - Identity handling occurs in serializers.
 - Soft delete handled at model layer.
 - Queryset defined explicitly.
-- Permissions declared explicitly.
-
-Mutation Scope
---------------
-- Creation allowed (identity injected in serializer).
-- Update allowed (restricted fields only).
-- Delete performs soft delete via model.
 """
 
-from rest_framework.permissions import AllowAny
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from genericissuetracker.models import Issue
 from genericissuetracker.serializers.v1.read.issue import IssueReadSerializer
@@ -40,6 +33,38 @@ from genericissuetracker.serializers.v1.write.issue import (
 from genericissuetracker.views.v1.base import BaseCRUDViewSet
 
 
+@extend_schema_view(
+    list=extend_schema(
+        operation_id="issue_crud_list",
+        tags=["Issue"],
+        summary="List issues (write-capable endpoint)",
+    ),
+    retrieve=extend_schema(
+        operation_id="issue_crud_retrieve",
+        tags=["Issue"],
+        summary="Retrieve issue (write-capable endpoint)",
+    ),
+    create=extend_schema(
+        operation_id="issue_create",
+        tags=["Issue"],
+        summary="Create new issue",
+    ),
+    update=extend_schema(
+        operation_id="issue_update",
+        tags=["Issue"],
+        summary="Update issue",
+    ),
+    partial_update=extend_schema(
+        operation_id="issue_partial_update",
+        tags=["Issue"],
+        summary="Partially update issue",
+    ),
+    destroy=extend_schema(
+        operation_id="issue_delete",
+        tags=["Issue"],
+        summary="Soft delete issue",
+    ),
+)
 class IssueCRUDViewSet(BaseCRUDViewSet):
     """
     Write-capable ViewSet for Issue.
@@ -49,23 +74,20 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
         - Update issues
         - Soft delete issues
 
-    Read operations routed to IssueReadViewSet.
+    Read operations are also available here,
+    but a dedicated read-only ViewSet exists
+    for strict architectural separation.
     """
 
     queryset = Issue.objects.all()
 
     read_serializer_class = IssueReadSerializer
-    write_serializer_class = IssueCreateSerializer  # default for create
+    write_serializer_class = IssueCreateSerializer
 
+    # ------------------------------------------------------------------
+    # Serializer Routing
+    # ------------------------------------------------------------------
     def get_serializer_class(self):
-        """
-        Explicit serializer routing for create vs update.
-
-        - create → IssueCreateSerializer
-        - update/partial_update → IssueUpdateSerializer
-        - destroy → IssueUpdateSerializer (no payload)
-        - list/retrieve → IssueReadSerializer
-        """
         if self.action == "create":
             return IssueCreateSerializer
 
@@ -80,10 +102,8 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
 
         return super().get_serializer_class()
 
+    # ------------------------------------------------------------------
+    # Soft Delete Handling
+    # ------------------------------------------------------------------
     def perform_destroy(self, instance):
-        """
-        Soft delete instead of hard delete.
-
-        Delegates deletion behavior to model layer.
-        """
         instance.soft_delete()
