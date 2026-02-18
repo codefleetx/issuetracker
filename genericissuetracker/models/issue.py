@@ -35,11 +35,10 @@ Important Architecture Decisions
 3. Index critical fields for filtering performance.
 """
 
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Max
 
 from .base import BaseModel
-from django.db import transaction
-from django.db.models import Max
 
 
 # ----------------------------------------------------------------------

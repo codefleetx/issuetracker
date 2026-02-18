@@ -1,10 +1,18 @@
+# ======================================================================
+# Generic Issue Tracker
+# Production-Grade Packaging Configuration
+# PEP 621 Compliant
+# ======================================================================
+
 [project]
 name = "genericissuetracker"
-version = "0.4.1"
+version = "0.4.2"
 description = "Reusable, versioned, schema-safe Django Issue Tracker application."
-readme = "README.md"
+readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.8"
-license = { text = "MIT" }
+
+license = "MIT"
+license-files = ["LICENSE"]
 
 authors = [
     { name = "BinaryFleet" }
@@ -12,21 +20,42 @@ authors = [
 
 keywords = [
     "django",
+    "django-rest-framework",
     "issue-tracker",
-    "drf",
-    "openapi",
+    "bug-tracker",
     "project-management",
+    "openapi",
+    "drf",
+    "api",
+    "versioned-api"
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+
+    "Intended Audience :: Developers",
+
+    "Operating System :: OS Independent",
+
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Bug Tracking",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
 
 # ----------------------------------------------------------------------
 # Runtime Dependencies
-# ----------------------------------------------------------------------
 # These are REQUIRED for the library to function.
-# They will be installed automatically when someone runs:
+# Installed automatically via:
 #     pip install genericissuetracker
-#
-# Only include dependencies strictly required at runtime.
-# Do NOT include dev tools here.
 # ----------------------------------------------------------------------
 dependencies = [
     "Django>=4.2",
@@ -34,55 +63,62 @@ dependencies = [
     "drf-spectacular>=0.27",
 ]
 
+# ----------------------------------------------------------------------
+# Project URLs
+# ----------------------------------------------------------------------
 [project.urls]
 Homepage = "https://github.com/binaryfleet/issuetracker"
 Repository = "https://github.com/binaryfleet/issuetracker"
 Issues = "https://github.com/binaryfleet/issuetracker/issues"
+Documentation = "https://github.com/binaryfleet/issuetracker#readme"
 
 # ----------------------------------------------------------------------
 # Optional Dependencies (Development Only)
-# ----------------------------------------------------------------------
 # Install via:
 #     pip install genericissuetracker[dev]
 # ----------------------------------------------------------------------
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.3.0",
+    "ruff>=0.4.0",
     "pytest>=7.0",
     "pytest-django>=4.5",
 ]
 
-# ----------------------------------------------------------------------
-# Build System (PEP 517/518 compliant)
-# ----------------------------------------------------------------------
+# ======================================================================
+# Build System (PEP 517/518)
+# ======================================================================
+
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 # ----------------------------------------------------------------------
+# Setuptools Configuration
+# Use automatic discovery instead of hardcoding packages
+# ----------------------------------------------------------------------
+[tool.setuptools.packages.find]
+include = ["genericissuetracker*"]
+
+# ======================================================================
 # Ruff Configuration
-# ----------------------------------------------------------------------
-# Industry standard:
-# - Strict linting
-# - Deterministic imports
-# - No hidden complexity
-# ----------------------------------------------------------------------
+# Strict, deterministic linting
+# ======================================================================
+
 [tool.ruff]
 line-length = 100
 target-version = "py38"
 
 [tool.ruff.lint]
 select = [
-    "E",   # pycodestyle errors
+    "E",   # pycodestyle
     "F",   # pyflakes
     "I",   # import sorting
     "UP",  # pyupgrade
     "B",   # bugbear
 ]
 ignore = [
-    "E501",  # line length handled separately
+    "E501",  # handled separately
 ]
 
 [tool.ruff.lint.isort]
 known-first-party = ["genericissuetracker"]
-
