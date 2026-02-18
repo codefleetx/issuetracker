@@ -83,6 +83,9 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
 
     read_serializer_class = IssueReadSerializer
     write_serializer_class = IssueCreateSerializer
+    lookup_field = "issue_number"
+    lookup_url_kwarg = "issue_number"
+
 
     # ------------------------------------------------------------------
     # Serializer Routing

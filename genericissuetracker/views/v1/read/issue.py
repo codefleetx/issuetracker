@@ -52,6 +52,8 @@ class IssueReadViewSet(BaseReadOnlyViewSet):
     search_fields = ["title", "description", "reporter_email"]
     ordering_fields = ["created_at", "updated_at", "priority"]
     ordering = ["-created_at"]
+    lookup_field = "issue_number"
+    lookup_url_kwarg = "issue_number"
 
     queryset = (
         Issue.objects

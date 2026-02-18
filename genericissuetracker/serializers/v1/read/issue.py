@@ -53,6 +53,7 @@ class IssueReadSerializer(serializers.ModelSerializer):
         fields = [
             # Primary Identity
             "id",
+            "issue_number",
 
             # Content
             "title",
