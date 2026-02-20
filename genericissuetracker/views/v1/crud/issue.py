@@ -23,6 +23,7 @@ Design Principles
 """
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from genericissuetracker.models import Issue
 from genericissuetracker.serializers.v1.read.issue import IssueReadSerializer
@@ -83,13 +84,12 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
 
     read_serializer_class = IssueReadSerializer
     write_serializer_class = IssueCreateSerializer
+
     lookup_field = "issue_number"
-    lookup_url_kwarg = "issue_number"
+    lookup_url_kwarg = "pk"
 
+    http_method_names = ["get", "post", "patch", "delete", "head", "options"]    
 
-    # ------------------------------------------------------------------
-    # Serializer Routing
-    # ------------------------------------------------------------------
     def get_serializer_class(self):
         if self.action == "create":
             return IssueCreateSerializer
@@ -97,16 +97,37 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
         if self.action in ["update", "partial_update"]:
             return IssueUpdateSerializer
 
-        if self.action in ["list", "retrieve"]:
-            return self.read_serializer_class
-
         if self.action == "destroy":
             return IssueUpdateSerializer
 
         return super().get_serializer_class()
+    
+    # ------------------------------------------------------------------
+    # Permission Routing
+    # ------------------------------------------------------------------
+    def get_permissions(self):
+        """
+        Permission Rules:
+
+        - Anyone can CREATE
+        - Only authenticated users can UPDATE or DELETE
+        - Read behavior follows default permission configuration
+        """
+
+        if self.action == "create":
+            return [AllowAny()]
+
+        if self.action in ["update", "partial_update", "destroy"]:
+            return [IsAuthenticated()]
+
+        return super().get_permissions()
 
     # ------------------------------------------------------------------
     # Soft Delete Handling
     # ------------------------------------------------------------------
     def perform_destroy(self, instance):
         instance.soft_delete()
+    
+    def update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return super().update(request, *args, **kwargs)
