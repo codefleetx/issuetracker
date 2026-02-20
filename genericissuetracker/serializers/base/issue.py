@@ -32,7 +32,6 @@ This serializer:
     • Must not dynamically change fields
 """
 
-from typing import Any, Dict
 
 from rest_framework import serializers
 
@@ -80,53 +79,46 @@ class BaseIssueWriteSerializer(serializers.ModelSerializer):
 
         return value
 
-    # ------------------------------------------------------------------
-    # VALIDATION: IDENTITY ENFORCEMENT
-    # ------------------------------------------------------------------
-    def _resolve_identity(self) -> Dict[str, Any]:
-        """
-        Resolve request identity using configured resolver.
-        """
-        request = self.context.get("request")
-        resolver = get_identity_resolver()
-        return resolver.resolve(request)
-
-    def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
+    def validate(self, attrs):
         """
         Global validation hook.
 
         Enforces:
             - Anonymous reporting rules
-            - Reporter identity injection
+            - Reporter identity injection ONLY during creation.
         """
-        identity = self._resolve_identity()
+
+        # Only enforce identity during create
+        if self.instance is not None:
+            return attrs
+
+        request = self.context.get("request")
+        resolver = get_identity_resolver()
+        identity = resolver.resolve(request)
 
         allow_anonymous = get_setting("ALLOW_ANONYMOUS_REPORTING")
 
-        # Prevent client from injecting reporter fields
+        # Prevent spoofing
         attrs.pop("reporter_user_id", None)
         attrs.pop("reporter_email", None)
 
         if identity["is_authenticated"]:
-            # Authenticated user: inject identity
             attrs["reporter_user_id"] = identity["id"]
             attrs["reporter_email"] = identity["email"]
-
         else:
-            # Anonymous user
             if not allow_anonymous:
                 raise serializers.ValidationError(
                     "Authentication required to create an issue."
                 )
 
-            # Anonymous must provide email in request data
             email = self.initial_data.get("reporter_email")
             if not email:
                 raise serializers.ValidationError(
                     {"reporter_email": "This field is required for anonymous reporting."}
                 )
 
-            attrs["reporter_email"] = email
             attrs["reporter_user_id"] = None
+            attrs["reporter_email"] = email
 
         return attrs
+    
