@@ -1,5 +1,6 @@
-from genericissuetracker.settings import get_setting
 from importlib import import_module
+
+from genericissuetracker.settings import get_setting
 
 
 class DefaultTransitionPolicy:

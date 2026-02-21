@@ -3,8 +3,9 @@ from rest_framework.exceptions import PermissionDenied
 
 from genericissuetracker.models import IssueStatusHistory
 from genericissuetracker.signals import issue_status_changed
-from .lifecycle_rules import validate_transition
+
 from .lifecycle_policy import get_transition_policy
+from .lifecycle_rules import validate_transition
 
 
 def change_issue_status(issue, new_status, identity):

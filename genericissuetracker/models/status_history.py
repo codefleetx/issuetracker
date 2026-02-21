@@ -1,4 +1,5 @@
 from django.db import models
+
 from genericissuetracker.models.base import BaseModel
 from genericissuetracker.models.issue import IssueStatus
 

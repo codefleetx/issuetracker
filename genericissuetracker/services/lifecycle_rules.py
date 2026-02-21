@@ -1,3 +1,5 @@
+from rest_framework.exceptions import ValidationError
+
 from genericissuetracker.models import IssueStatus
 
 ALLOWED_TRANSITIONS = {
@@ -18,8 +20,6 @@ ALLOWED_TRANSITIONS = {
     ],
 }
 
-
-from rest_framework.exceptions import ValidationError
 
 def validate_transition(old_status, new_status):
     if old_status == new_status:

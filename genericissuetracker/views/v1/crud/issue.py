@@ -23,10 +23,10 @@ Design Principles
 """
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework import status as drf_status
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
 from genericissuetracker.models import Issue
 from genericissuetracker.serializers.v1.read.issue import IssueReadSerializer
@@ -37,9 +37,9 @@ from genericissuetracker.serializers.v1.write.issue import (
 from genericissuetracker.serializers.v1.write.status import (
     IssueStatusUpdateSerializer,
 )
-from genericissuetracker.views.v1.base import BaseCRUDViewSet
 from genericissuetracker.services.identity import get_identity_resolver
 from genericissuetracker.services.issue_lifecycle import change_issue_status
+from genericissuetracker.views.v1.base import BaseCRUDViewSet
 
 
 @extend_schema_view(
