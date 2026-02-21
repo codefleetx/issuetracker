@@ -24,6 +24,9 @@ Design Principles
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status as drf_status
 
 from genericissuetracker.models import Issue
 from genericissuetracker.serializers.v1.read.issue import IssueReadSerializer
@@ -31,7 +34,12 @@ from genericissuetracker.serializers.v1.write.issue import (
     IssueCreateSerializer,
     IssueUpdateSerializer,
 )
+from genericissuetracker.serializers.v1.write.status import (
+    IssueStatusUpdateSerializer,
+)
 from genericissuetracker.views.v1.base import BaseCRUDViewSet
+from genericissuetracker.services.identity import get_identity_resolver
+from genericissuetracker.services.issue_lifecycle import change_issue_status
 
 
 @extend_schema_view(
@@ -88,8 +96,11 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
     lookup_field = "issue_number"
     lookup_url_kwarg = "pk"
 
-    http_method_names = ["get", "post", "patch", "delete", "head", "options"]    
+    http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
+    # ------------------------------------------------------------------
+    # Serializer Routing
+    # ------------------------------------------------------------------
     def get_serializer_class(self):
         if self.action == "create":
             return IssueCreateSerializer
@@ -100,8 +111,11 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
         if self.action == "destroy":
             return IssueUpdateSerializer
 
+        if self.action == "change_status":
+            return IssueStatusUpdateSerializer
+
         return super().get_serializer_class()
-    
+
     # ------------------------------------------------------------------
     # Permission Routing
     # ------------------------------------------------------------------
@@ -127,7 +141,39 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
     # ------------------------------------------------------------------
     def perform_destroy(self, instance):
         instance.soft_delete()
-    
+
     def update(self, request, *args, **kwargs):
         kwargs["partial"] = True
         return super().update(request, *args, **kwargs)
+
+    # ------------------------------------------------------------------
+    # Status Transition (Lifecycle Engine)
+    # ------------------------------------------------------------------
+    @action(detail=True, methods=["post"], url_path="change-status")
+    def change_status(self, request, pk=None):
+        """
+        Change issue status using lifecycle service.
+
+        Delegates:
+            - Transition validation
+            - Policy enforcement
+            - Atomic DB update
+            - Status history creation
+            - Signal dispatch
+        """
+
+        issue = self.get_object()
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        new_status = serializer.validated_data["status"]
+
+        identity = get_identity_resolver().resolve(request)
+
+        change_issue_status(issue, new_status, identity)
+
+        return Response(
+            {"detail": "Status updated successfully."},
+            status=drf_status.HTTP_200_OK,
+        )

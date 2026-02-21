@@ -1,0 +1,38 @@
+from django.db import transaction
+from rest_framework.exceptions import PermissionDenied
+
+from genericissuetracker.models import IssueStatusHistory
+from genericissuetracker.signals import issue_status_changed
+from .lifecycle_rules import validate_transition
+from .lifecycle_policy import get_transition_policy
+
+
+def change_issue_status(issue, new_status, identity):
+    old_status = issue.status
+
+    validate_transition(old_status, new_status)
+
+    policy = get_transition_policy()
+
+    if not policy.can_transition(issue, old_status, new_status, identity):
+        raise PermissionDenied("Transition not allowed.")
+
+    with transaction.atomic():
+        issue.status = new_status
+        issue.save(update_fields=["status"])
+
+        IssueStatusHistory.objects.create(
+            issue=issue,
+            old_status=old_status,
+            new_status=new_status,
+            changed_by_user_id=identity.get("id"),
+            changed_by_email=identity.get("email"),
+        )
+
+        issue_status_changed.send(
+            sender=issue.__class__,
+            issue=issue,
+            old_status=old_status,
+            new_status=new_status,
+            identity=identity,
+        )

@@ -138,6 +138,11 @@ DEFAULTS = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
+    
+    # --------------------------------------------------------------
+    # Issue Status Transition Policy
+    # --------------------------------------------------------------
+    "TRANSITION_POLICY": None,
 
 }
 
