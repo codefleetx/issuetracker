@@ -6,6 +6,30 @@ This project follows Semantic Versioning.
 
 ---
 
+## [0.5.0] - 2026-02-21
+
+### Added
+- Lifecycle state machine with transition matrix
+- Reopen support (`RESOLVED → OPEN`, `CLOSED → OPEN`)
+- `IssueStatusHistory` model for lifecycle audit trail
+- Atomic transaction wrapper for status transitions
+- Dedicated service layer for lifecycle operations
+- Pluggable transition policy hook (`GENERIC_ISSUETRACKER_TRANSITION_POLICY`)
+- Strict validation preventing same-to-same transitions
+- Custom `/change-status/` endpoint (v1 API)
+
+### Changed
+- Status transitions now enforced through deterministic state machine
+- Status change logic moved from ViewSet into service layer
+- Status updates no longer allowed via generic update endpoints
+- Transition validation now returns 400 for illegal or redundant transitions
+
+### Security
+- Prevented no-op transitions from polluting audit history
+- Ensured lifecycle updates are atomic and rollback-safe
+
+---
+
 ## [0.4.3] - 2026-02-20
 
 ### Fixed
