@@ -1,0 +1,1391 @@
+openapi: 3.0.3
+info:
+  title: Generic Issue Tracker API (Dev)
+  version: v1
+paths:
+  /api/v1/attachments/:
+    get:
+      operationId: attachment_crud_list
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: List attachments (write-capable endpoint)
+      tags:
+      - Attachment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueAttachmentRead'
+          description: ''
+    post:
+      operationId: attachment_create
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Upload attachment
+      tags:
+      - Attachment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueAttachmentUpload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IssueAttachmentUpload'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IssueAttachmentUpload'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueAttachmentUpload'
+          description: ''
+  /api/v1/attachments-read/:
+    get:
+      operationId: attachment_read_list
+      description: |-
+        Base class for read-only endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `queryset`
+      summary: List attachments (read-only)
+      tags:
+      - Attachment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueAttachmentRead'
+          description: ''
+  /api/v1/attachments-read/{id}/:
+    get:
+      operationId: attachment_read_retrieve
+      description: |-
+        Base class for read-only endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `queryset`
+      summary: Retrieve attachment (read-only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Attachment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueAttachmentRead'
+          description: ''
+  /api/v1/attachments/{id}/:
+    get:
+      operationId: attachment_crud_retrieve
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Retrieve attachment (write-capable endpoint)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Attachment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueAttachmentRead'
+          description: ''
+    delete:
+      operationId: attachment_delete
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Soft delete attachment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Attachment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/comments/:
+    get:
+      operationId: comment_crud_list
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: List comments (write-capable endpoint)
+      tags:
+      - Comment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueCommentRead'
+          description: ''
+    post:
+      operationId: comment_create
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Create comment
+      tags:
+      - Comment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueCommentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IssueCommentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IssueCommentCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueCommentCreate'
+          description: ''
+  /api/v1/comments-read/:
+    get:
+      operationId: comment_read_list
+      description: |-
+        Base class for read-only endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `queryset`
+      summary: List comments (read-only)
+      tags:
+      - Comment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueCommentRead'
+          description: ''
+  /api/v1/comments-read/{id}/:
+    get:
+      operationId: comment_read_retrieve
+      description: |-
+        Base class for read-only endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `queryset`
+      summary: Retrieve comment (read-only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Comment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueCommentRead'
+          description: ''
+  /api/v1/comments/{id}/:
+    get:
+      operationId: comment_crud_retrieve
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Retrieve comment (write-capable endpoint)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Comment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueCommentRead'
+          description: ''
+    delete:
+      operationId: comment_delete
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Soft delete comment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Comment
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/issues/:
+    get:
+      operationId: issue_crud_list
+      description: |-
+        Write-capable ViewSet for Issue.
+
+        Responsibilities:
+            - Create issues
+            - Update issues
+            - Soft delete issues
+
+        Read operations are also available here,
+        but a dedicated read-only ViewSet exists
+        for strict architectural separation.
+      summary: List issues (write-capable endpoint)
+      tags:
+      - Issue
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueRead'
+          description: ''
+    post:
+      operationId: issue_create
+      description: |-
+        Write-capable ViewSet for Issue.
+
+        Responsibilities:
+            - Create issues
+            - Update issues
+            - Soft delete issues
+
+        Read operations are also available here,
+        but a dedicated read-only ViewSet exists
+        for strict architectural separation.
+      summary: Create new issue
+      tags:
+      - Issue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IssueCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IssueCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueCreate'
+          description: ''
+  /api/v1/issues-read/:
+    get:
+      operationId: issue_read_list
+      description: |-
+        Read-only ViewSet for Issue.
+
+        Responsibilities:
+            - List issues
+            - Retrieve issue detail
+      summary: List issues (read-only)
+      tags:
+      - Issue
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueRead'
+          description: ''
+  /api/v1/issues-read/{issue_number}/:
+    get:
+      operationId: issue_read_retrieve
+      description: |-
+        Read-only ViewSet for Issue.
+
+        Responsibilities:
+            - List issues
+            - Retrieve issue detail
+      summary: Retrieve issue (read-only)
+      parameters:
+      - in: path
+        name: issue_number
+        schema:
+          type: integer
+          description: Sequential human-friendly identifier for this issue.
+        required: true
+      tags:
+      - Issue
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueRead'
+          description: ''
+  /api/v1/issues/{id}/:
+    get:
+      operationId: issue_crud_retrieve
+      description: |-
+        Write-capable ViewSet for Issue.
+
+        Responsibilities:
+            - Create issues
+            - Update issues
+            - Soft delete issues
+
+        Read operations are also available here,
+        but a dedicated read-only ViewSet exists
+        for strict architectural separation.
+      summary: Retrieve issue (write-capable endpoint)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Issue
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueRead'
+          description: ''
+    patch:
+      operationId: issue_partial_update
+      description: |-
+        Write-capable ViewSet for Issue.
+
+        Responsibilities:
+            - Create issues
+            - Update issues
+            - Soft delete issues
+
+        Read operations are also available here,
+        but a dedicated read-only ViewSet exists
+        for strict architectural separation.
+      summary: Partially update issue
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Issue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedIssueUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedIssueUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedIssueUpdate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueUpdate'
+          description: ''
+    delete:
+      operationId: issue_delete
+      description: |-
+        Write-capable ViewSet for Issue.
+
+        Responsibilities:
+            - Create issues
+            - Update issues
+            - Soft delete issues
+
+        Read operations are also available here,
+        but a dedicated read-only ViewSet exists
+        for strict architectural separation.
+      summary: Soft delete issue
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Issue
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/labels/:
+    get:
+      operationId: label_crud_list
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: List labels (write-capable endpoint)
+      tags:
+      - Label
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabelRead'
+          description: ''
+    post:
+      operationId: label_create
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Create label
+      tags:
+      - Label
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabelCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LabelCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LabelCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelCreate'
+          description: ''
+  /api/v1/labels-read/:
+    get:
+      operationId: label_read_list
+      description: |-
+        Base class for read-only endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `queryset`
+      summary: List labels (read-only)
+      tags:
+      - Label
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabelRead'
+          description: ''
+  /api/v1/labels-read/{id}/:
+    get:
+      operationId: label_read_retrieve
+      description: |-
+        Base class for read-only endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `queryset`
+      summary: Retrieve label (read-only)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Label
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelRead'
+          description: ''
+  /api/v1/labels/{id}/:
+    get:
+      operationId: label_crud_retrieve
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Retrieve label (write-capable endpoint)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Label
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelRead'
+          description: ''
+    delete:
+      operationId: label_delete
+      description: |-
+        Base class for write-capable endpoints.
+
+        Requirements:
+            - Must define `read_serializer_class`
+            - Must define `write_serializer_class`
+            - Must define `queryset`
+      summary: Soft delete label
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - Label
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    IssueAttachmentRead:
+      type: object
+      description: Deterministic representation of an Issue attachment.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Universally unique identifier for this record.
+        issue:
+          type: string
+          format: uuid
+          description: Issue this attachment belongs to.
+          readOnly: true
+        file:
+          type: string
+          format: uri
+          readOnly: true
+          description: Uploaded file.
+        original_name:
+          type: string
+          readOnly: true
+          description: Original filename at upload time.
+        size:
+          type: integer
+          readOnly: true
+          description: File size in bytes.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was last updated.
+      required:
+      - created_at
+      - file
+      - id
+      - issue
+      - original_name
+      - size
+      - updated_at
+    IssueAttachmentUpload:
+      type: object
+      description: Serializer for uploading attachments.
+      properties:
+        issue:
+          type: string
+          format: uuid
+          description: Issue this attachment belongs to.
+        file:
+          type: string
+          format: uri
+          description: Uploaded file.
+      required:
+      - file
+      - issue
+    IssueCommentCreate:
+      type: object
+      description: Serializer for creating new comments.
+      properties:
+        issue:
+          type: string
+          format: uuid
+          description: The issue this comment belongs to.
+        body:
+          type: string
+          description: Comment content in markdown or plain text.
+        commenter_email:
+          type: string
+          format: email
+          description: Required for anonymous users.
+      required:
+      - body
+      - issue
+    IssueCommentRead:
+      type: object
+      description: Deterministic representation of an Issue comment.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Universally unique identifier for this record.
+        issue:
+          type: string
+          format: uuid
+          description: The issue this comment belongs to.
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+          description: Comment content in markdown or plain text.
+        commenter_email:
+          type: string
+          format: email
+          readOnly: true
+          description: Email address of the commenter.
+        commenter_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Optional user ID from host application identity system.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was last updated.
+      required:
+      - body
+      - commenter_email
+      - commenter_user_id
+      - created_at
+      - id
+      - issue
+      - updated_at
+    IssueCreate:
+      type: object
+      description: |-
+        Serializer for creating new issues.
+
+        Exposes reporter_email only for anonymous users.
+        Authenticated identity is inhjected automatically.
+      properties:
+        issue_number:
+          type: integer
+          readOnly: true
+          description: Sequential human-friendly identifier for this issue.
+        title:
+          type: string
+          description: Short descriptive title of the issue.
+          maxLength: 255
+        description:
+          type: string
+          description: Detailed explanation of the issue in markdown or plain text.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+          description: |-
+            Current lifecycle state of the issue.
+
+            * `OPEN` - Open
+            * `IN_PROGRESS` - In Progress
+            * `RESOLVED` - Resolved
+            * `CLOSED` - Closed
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          description: |-
+            Severity level of the issue.
+
+            * `LOW` - Low
+            * `MEDIUM` - Medium
+            * `HIGH` - High
+            * `CRITICAL` - Critical
+        is_public:
+          type: boolean
+          description: If False, issue is restricted to internal viewers.
+        reporter_email:
+          type: string
+          format: email
+          description: Required for anonymous users.
+      required:
+      - description
+      - issue_number
+      - status
+      - title
+    IssueRead:
+      type: object
+      description: |-
+        Deterministic representation of an Issue.
+
+        Includes:
+            - Core issue fields
+            - Reporter metadata snapshot
+            - Nested comments
+            - Nested labels
+            - Nested attachments
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Universally unique identifier for this record.
+        issue_number:
+          type: integer
+          readOnly: true
+          description: Sequential human-friendly identifier for this issue.
+        title:
+          type: string
+          readOnly: true
+          description: Short descriptive title of the issue.
+        description:
+          type: string
+          readOnly: true
+          description: Detailed explanation of the issue in markdown or plain text.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+          description: |-
+            Current lifecycle state of the issue.
+
+            * `OPEN` - Open
+            * `IN_PROGRESS` - In Progress
+            * `RESOLVED` - Resolved
+            * `CLOSED` - Closed
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          readOnly: true
+          description: |-
+            Severity level of the issue.
+
+            * `LOW` - Low
+            * `MEDIUM` - Medium
+            * `HIGH` - High
+            * `CRITICAL` - Critical
+        is_public:
+          type: boolean
+          readOnly: true
+          description: If False, issue is restricted to internal viewers.
+        reporter_email:
+          type: string
+          format: email
+          readOnly: true
+          description: Email address of the issue reporter.
+        reporter_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Optional user ID from host application identity system.
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/LabelRead'
+          readOnly: true
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssueCommentRead'
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssueAttachmentRead'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was last updated.
+      required:
+      - attachments
+      - comments
+      - created_at
+      - description
+      - id
+      - is_public
+      - issue_number
+      - labels
+      - priority
+      - reporter_email
+      - reporter_user_id
+      - status
+      - title
+      - updated_at
+    IssueUpdate:
+      type: object
+      description: |-
+        Serializer for updating existing issue.
+
+        Rules:
+            - reporter_email cannot be changed.
+            - reporter_user_id cannot be changed.
+            - Status changes restricted.
+      properties:
+        issue_number:
+          type: integer
+          readOnly: true
+          description: Sequential human-friendly identifier for this issue.
+        title:
+          type: string
+          description: Short descriptive title of the issue.
+          maxLength: 255
+        description:
+          type: string
+          description: Detailed explanation of the issue in markdown or plain text.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+          description: |-
+            Current lifecycle state of the issue.
+
+            * `OPEN` - Open
+            * `IN_PROGRESS` - In Progress
+            * `RESOLVED` - Resolved
+            * `CLOSED` - Closed
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          description: |-
+            Severity level of the issue.
+
+            * `LOW` - Low
+            * `MEDIUM` - Medium
+            * `HIGH` - High
+            * `CRITICAL` - Critical
+        is_public:
+          type: boolean
+          description: If False, issue is restricted to internal viewers.
+        reporter_email:
+          type: string
+          format: email
+          readOnly: true
+      required:
+      - description
+      - issue_number
+      - reporter_email
+      - status
+      - title
+    LabelCreate:
+      type: object
+      description: Serializer for creating labels.
+      properties:
+        name:
+          type: string
+          description: Human-readable label name.
+          maxLength: 50
+        slug:
+          type: string
+          description: Unique machine-friendly identifier for this label.
+          maxLength: 60
+          pattern: ^[-a-zA-Z0-9_]+$
+        color:
+          type: string
+          description: 'HEX color code (e.g. #FF5733). Validation handled in serializers.'
+          maxLength: 7
+      required:
+      - name
+      - slug
+    LabelRead:
+      type: object
+      description: Deterministic representation of a Label.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Universally unique identifier for this record.
+        name:
+          type: string
+          readOnly: true
+          description: Human-readable label name.
+        slug:
+          type: string
+          readOnly: true
+          description: Unique machine-friendly identifier for this label.
+          pattern: ^[-a-zA-Z0-9_]+$
+        color:
+          type: string
+          readOnly: true
+          description: 'HEX color code (e.g. #FF5733). Validation handled in serializers.'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was created.
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp when this record was last updated.
+      required:
+      - color
+      - created_at
+      - id
+      - name
+      - slug
+      - updated_at
+    PatchedIssueUpdate:
+      type: object
+      description: |-
+        Serializer for updating existing issue.
+
+        Rules:
+            - reporter_email cannot be changed.
+            - reporter_user_id cannot be changed.
+            - Status changes restricted.
+      properties:
+        issue_number:
+          type: integer
+          readOnly: true
+          description: Sequential human-friendly identifier for this issue.
+        title:
+          type: string
+          description: Short descriptive title of the issue.
+          maxLength: 255
+        description:
+          type: string
+          description: Detailed explanation of the issue in markdown or plain text.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+          description: |-
+            Current lifecycle state of the issue.
+
+            * `OPEN` - Open
+            * `IN_PROGRESS` - In Progress
+            * `RESOLVED` - Resolved
+            * `CLOSED` - Closed
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          description: |-
+            Severity level of the issue.
+
+            * `LOW` - Low
+            * `MEDIUM` - Medium
+            * `HIGH` - High
+            * `CRITICAL` - Critical
+        is_public:
+          type: boolean
+          description: If False, issue is restricted to internal viewers.
+        reporter_email:
+          type: string
+          format: email
+          readOnly: true
+    PriorityEnum:
+      enum:
+      - LOW
+      - MEDIUM
+      - HIGH
+      - CRITICAL
+      type: string
+      description: |-
+        * `LOW` - Low
+        * `MEDIUM` - Medium
+        * `HIGH` - High
+        * `CRITICAL` - Critical
+    StatusEnum:
+      enum:
+      - OPEN
+      - IN_PROGRESS
+      - RESOLVED
+      - CLOSED
+      type: string
+      description: |-
+        * `OPEN` - Open
+        * `IN_PROGRESS` - In Progress
+        * `RESOLVED` - Resolved
+        * `CLOSED` - Closed
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

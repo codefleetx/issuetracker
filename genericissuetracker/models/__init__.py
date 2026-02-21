@@ -31,6 +31,7 @@ from .attachment import IssueAttachment
 from .comment import IssueComment
 from .issue import Issue, IssuePriority, IssueStatus
 from .label import Label
+from .status_history import IssueStatusHistory
 
 __all__ = [
     "Issue",
@@ -39,4 +40,5 @@ __all__ = [
     "IssueComment",
     "Label",
     "IssueAttachment",
+    "IssueStatusHistory",
 ]
