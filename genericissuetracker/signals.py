@@ -87,3 +87,23 @@ Kwargs:
     new_status: str
     identity: dict containing identity resolution result
 """
+
+
+issue_updated = Signal()
+"""
+Dispatched after an issue is successfully updated.
+
+Kwargs:
+    issue: Issue instance
+    identity: dict containing identity resolution result
+"""
+
+
+issue_deleted = Signal()
+"""
+Dispatched after an issue is soft deleted.
+
+Kwargs:
+    issue: Issue instance
+    identity: dict containing identity resolution result
+"""
