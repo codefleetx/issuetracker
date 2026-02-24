@@ -39,6 +39,10 @@ from genericissuetracker.serializers.v1.write.status import (
 )
 from genericissuetracker.services.identity import get_identity_resolver
 from genericissuetracker.services.issue_lifecycle import change_issue_status
+from genericissuetracker.signals import (
+    issue_updated,
+    issue_deleted,
+)
 from genericissuetracker.views.v1.base import BaseCRUDViewSet
 
 
@@ -137,10 +141,32 @@ class IssueCRUDViewSet(BaseCRUDViewSet):
         return super().get_permissions()
 
     # ------------------------------------------------------------------
-    # Soft Delete Handling
+    # Update Handling (Signal Emission Added)
+    # ------------------------------------------------------------------
+    def perform_update(self, serializer):
+        instance = serializer.save()
+
+        identity = get_identity_resolver().resolve(self.request)
+
+        issue_updated.send(
+            sender=self.__class__,
+            issue=instance,
+            identity=identity,
+        )
+
+    # ------------------------------------------------------------------
+    # Soft Delete Handling (Signal Emission Added)
     # ------------------------------------------------------------------
     def perform_destroy(self, instance):
+        identity = get_identity_resolver().resolve(self.request)
+
         instance.soft_delete()
+
+        issue_deleted.send(
+            sender=self.__class__,
+            issue=instance,
+            identity=identity,
+        )
 
     def update(self, request, *args, **kwargs):
         kwargs["partial"] = True
