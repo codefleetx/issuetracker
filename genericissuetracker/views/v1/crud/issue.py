@@ -40,8 +40,8 @@ from genericissuetracker.serializers.v1.write.status import (
 from genericissuetracker.services.identity import get_identity_resolver
 from genericissuetracker.services.issue_lifecycle import change_issue_status
 from genericissuetracker.signals import (
-    issue_updated,
     issue_deleted,
+    issue_updated,
 )
 from genericissuetracker.views.v1.base import BaseCRUDViewSet
 
