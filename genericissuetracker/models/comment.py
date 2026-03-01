@@ -36,11 +36,10 @@ Threaded comments can be introduced in v2 via:
 Without breaking schema compatibility.
 """
 
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Max
 
 from .base import BaseModel
-from django.db import transaction
-from django.db.models import Max
 
 
 class IssueComment(BaseModel):

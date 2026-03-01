@@ -34,11 +34,10 @@ Deleted labels:
     • Preserve historical issue relations
 """
 
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Max
 
 from .base import BaseModel
-from django.db import transaction
-from django.db.models import Max
 
 
 class Label(BaseModel):

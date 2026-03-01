@@ -39,11 +39,10 @@ Designed to support:
 
 import os
 
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Max
 
 from .base import BaseModel
-from django.db import transaction
-from django.db.models import Max
 
 
 def issue_attachment_upload_path(instance, filename: str) -> str:
