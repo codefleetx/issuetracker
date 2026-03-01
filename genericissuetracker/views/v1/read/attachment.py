@@ -33,3 +33,7 @@ class AttachmentReadViewSet(BaseReadOnlyViewSet):
     search_fields = ["original_name"]
     ordering_fields = ["created_at", "updated_at"]
     ordering = ["-created_at"]
+    
+    lookup_field = "number"
+    lookup_url_kwarg = "number"
+

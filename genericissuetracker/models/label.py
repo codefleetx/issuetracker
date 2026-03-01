@@ -37,6 +37,8 @@ Deleted labels:
 from django.db import models
 
 from .base import BaseModel
+from django.db import transaction
+from django.db.models import Max
 
 
 class Label(BaseModel):
@@ -56,6 +58,16 @@ class Label(BaseModel):
     name = models.CharField(
         max_length=50,
         help_text="Human-readable label name.",
+    )
+    
+    # ------------------------------------------------------------------
+    # PUBLIC IDENTIFIER
+    # ------------------------------------------------------------------
+    number = models.BigIntegerField(
+        unique=True,
+        db_index=True,
+        editable=False,
+        help_text="Sequential human-friendly identifier for this label.",
     )
 
     slug = models.SlugField(
@@ -86,3 +98,19 @@ class Label(BaseModel):
     # ------------------------------------------------------------------
     def __str__(self) -> str:
         return self.name
+    
+    # ------------------------------------------------------------------
+    # AUTO ASSIGN NUMBER (v0.5.2)
+    # ------------------------------------------------------------------
+    def save(self, *args, **kwargs):
+        if self.number is None:
+            with transaction.atomic():
+                last_number = (
+                    Label.all_objects.aggregate(
+                        max_number=Max("number")
+                    )["max_number"]
+                    or 0
+                )
+                self.number = last_number + 1
+
+        super().save(*args, **kwargs)

@@ -19,7 +19,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -56,7 +55,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -79,7 +77,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -89,7 +86,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/IssueAttachmentRead'
           description: ''
-  /api/v1/attachments-read/{id}/:
+  /api/v1/attachments-read/{number}/:
     get:
       operationId: attachment_read_retrieve
       description: |-
@@ -101,18 +98,16 @@ paths:
       summary: Retrieve attachment (read-only)
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this attachment.
         required: true
       tags:
       - Attachment
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -120,7 +115,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IssueAttachmentRead'
           description: ''
-  /api/v1/attachments/{id}/:
+  /api/v1/attachments/{number}/:
     get:
       operationId: attachment_crud_retrieve
       description: |-
@@ -133,18 +128,16 @@ paths:
       summary: Retrieve attachment (write-capable endpoint)
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this attachment.
         required: true
       tags:
       - Attachment
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -164,18 +157,16 @@ paths:
       summary: Soft delete attachment
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this attachment.
         required: true
       tags:
       - Attachment
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '204':
           description: No response body
@@ -195,7 +186,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -232,7 +222,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -255,7 +244,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -265,7 +253,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/IssueCommentRead'
           description: ''
-  /api/v1/comments-read/{id}/:
+  /api/v1/comments-read/{number}/:
     get:
       operationId: comment_read_retrieve
       description: |-
@@ -277,18 +265,16 @@ paths:
       summary: Retrieve comment (read-only)
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this comment.
         required: true
       tags:
       - Comment
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -296,7 +282,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IssueCommentRead'
           description: ''
-  /api/v1/comments/{id}/:
+  /api/v1/comments/{number}/:
     get:
       operationId: comment_crud_retrieve
       description: |-
@@ -309,18 +295,16 @@ paths:
       summary: Retrieve comment (write-capable endpoint)
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this comment.
         required: true
       tags:
       - Comment
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -340,18 +324,16 @@ paths:
       summary: Soft delete comment
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this comment.
         required: true
       tags:
       - Comment
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '204':
           description: No response body
@@ -375,7 +357,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -439,7 +420,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -471,7 +451,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -507,7 +486,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -590,6 +568,50 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/issues/{id}/change-status/:
+    post:
+      operationId: api_v1_issues_change_status_create
+      description: |-
+        Change issue status using lifecycle service.
+
+        Delegates:
+            - Transition validation
+            - Policy enforcement
+            - Atomic DB update
+            - Status history creation
+            - Signal dispatch
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          description: Universally unique identifier for this record.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueStatusUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/IssueStatusUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IssueStatusUpdate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueStatusUpdate'
+          description: ''
   /api/v1/labels/:
     get:
       operationId: label_crud_list
@@ -606,7 +628,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -643,7 +664,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -666,7 +686,6 @@ paths:
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -676,7 +695,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/LabelRead'
           description: ''
-  /api/v1/labels-read/{id}/:
+  /api/v1/labels-read/{number}/:
     get:
       operationId: label_read_retrieve
       description: |-
@@ -688,18 +707,16 @@ paths:
       summary: Retrieve label (read-only)
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this label.
         required: true
       tags:
       - Label
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -707,7 +724,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LabelRead'
           description: ''
-  /api/v1/labels/{id}/:
+  /api/v1/labels/{number}/:
     get:
       operationId: label_crud_retrieve
       description: |-
@@ -720,18 +737,16 @@ paths:
       summary: Retrieve label (write-capable endpoint)
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this label.
         required: true
       tags:
       - Label
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -751,18 +766,16 @@ paths:
       summary: Soft delete label
       parameters:
       - in: path
-        name: id
+        name: number
         schema:
-          type: string
-          format: uuid
-          description: Universally unique identifier for this record.
+          type: integer
+          description: Sequential human-friendly identifier for this label.
         required: true
       tags:
       - Label
       security:
       - cookieAuth: []
       - basicAuth: []
-      - {}
       responses:
         '204':
           description: No response body
@@ -922,6 +935,10 @@ components:
           format: uuid
           readOnly: true
           description: Universally unique identifier for this record.
+        number:
+          type: integer
+          readOnly: true
+          description: Sequential human-friendly identifier for this attachment.
         issue:
           type: string
           format: uuid
@@ -955,6 +972,7 @@ components:
       - file
       - id
       - issue
+      - number
       - original_name
       - size
       - updated_at
@@ -984,6 +1002,7 @@ components:
         body:
           type: string
           description: Comment content in markdown or plain text.
+          maxLength: 10000
         commenter_email:
           type: string
           format: email
@@ -1000,6 +1019,10 @@ components:
           format: uuid
           readOnly: true
           description: Universally unique identifier for this record.
+        number:
+          type: integer
+          readOnly: true
+          description: Sequential human-friendly identifier for this comment.
         issue:
           type: string
           format: uuid
@@ -1036,6 +1059,7 @@ components:
       - created_at
       - id
       - issue
+      - number
       - updated_at
     IssueCreate:
       type: object
@@ -1194,6 +1218,13 @@ components:
       - status
       - title
       - updated_at
+    IssueStatusUpdate:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+      required:
+      - status
     IssueUpdate:
       type: object
       description: |-
@@ -1278,6 +1309,10 @@ components:
           format: uuid
           readOnly: true
           description: Universally unique identifier for this record.
+        number:
+          type: integer
+          readOnly: true
+          description: Sequential human-friendly identifier for this label.
         name:
           type: string
           readOnly: true
@@ -1306,6 +1341,7 @@ components:
       - created_at
       - id
       - name
+      - number
       - slug
       - updated_at
     PatchedIssueUpdate:

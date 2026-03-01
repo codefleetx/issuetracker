@@ -143,6 +143,15 @@ DEFAULTS = {
     # Issue Status Transition Policy
     # --------------------------------------------------------------
     "TRANSITION_POLICY": None,
+    
+    # --------------------------------------------------------------
+    # Comment Controls
+    # --------------------------------------------------------------
+    # Maximum allowed comment body length in characters.
+    # Enforced at serializer validation layer.
+    # Database hard cap is 10,000 characters.
+    # --------------------------------------------------------------
+    "MAX_COMMENT_LENGTH": 10000,
 
 }
 

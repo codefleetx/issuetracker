@@ -39,6 +39,8 @@ Without breaking schema compatibility.
 from django.db import models
 
 from .base import BaseModel
+from django.db import transaction
+from django.db.models import Max
 
 
 class IssueComment(BaseModel):
@@ -58,11 +60,22 @@ class IssueComment(BaseModel):
         db_index=True,
         help_text="The issue this comment belongs to.",
     )
+    
+    # ------------------------------------------------------------------
+    # PUBLIC IDENTIFIER
+    # ------------------------------------------------------------------
+    number = models.BigIntegerField(
+        unique=True,
+        db_index=True,
+        editable=False,
+        help_text="Sequential human-friendly identifier for this comment.",
+    )
 
     # ------------------------------------------------------------------
     # CONTENT
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------    
     body = models.TextField(
+        max_length=10000,
         help_text="Comment content in markdown or plain text.",
     )
 
@@ -96,3 +109,25 @@ class IssueComment(BaseModel):
     # ------------------------------------------------------------------
     def __str__(self) -> str:
         return f"Comment on {self.issue_id}"
+    
+    # ------------------------------------------------------------------
+    # AUTO ASSIGN NUMBER
+    # ------------------------------------------------------------------
+    def save(self, *args, **kwargs):
+        """
+        Automatically assign sequential number on first save.
+
+        Concurrency Safe:
+        Uses database transaction + MAX() aggregation.
+        """
+        if self.number is None:
+            with transaction.atomic():
+                last_number = (
+                    IssueComment.all_objects.aggregate(
+                        max_number=Max("number")
+                    )["max_number"]
+                    or 0
+                )
+                self.number = last_number + 1
+
+        super().save(*args, **kwargs)

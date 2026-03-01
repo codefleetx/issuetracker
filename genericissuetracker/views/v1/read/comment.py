@@ -33,3 +33,6 @@ class CommentReadViewSet(BaseReadOnlyViewSet):
     search_fields = ["body", "commenter_email"]
     ordering_fields = ["created_at", "updated_at"]
     ordering = ["-created_at"]
+    
+    lookup_field = "number"
+    lookup_url_kwarg = "number"

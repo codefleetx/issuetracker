@@ -23,6 +23,7 @@ class LabelReadSerializer(serializers.ModelSerializer):
         model = Label
         fields = [
             "id",
+            "number",
             "name",
             "slug",
             "color",

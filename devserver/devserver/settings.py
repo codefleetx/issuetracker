@@ -97,6 +97,6 @@ GENERIC_ISSUETRACKER_DEFAULT_PAGINATION_CLASS = "rest_framework.pagination.PageN
 GENERIC_ISSUETRACKER_PAGE_SIZE = 10
 
 GENERIC_ISSUETRACKER_DEFAULT_PERMISSION_CLASSES = [
-    # "rest_framework.permissions.IsAuthenticated",
-    "rest_framework.permissions.AllowAny",  # Uncomment for Test purpose only
+    "rest_framework.permissions.IsAuthenticated",
+    # "rest_framework.permissions.AllowAny",  # Uncomment for Test purpose only
 ]
