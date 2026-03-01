@@ -23,6 +23,7 @@ class IssueAttachmentReadSerializer(serializers.ModelSerializer):
         model = IssueAttachment
         fields = [
             "id",
+            "number",
             "issue",
             "file",
             "original_name",

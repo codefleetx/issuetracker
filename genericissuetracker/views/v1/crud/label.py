@@ -42,6 +42,9 @@ class LabelCRUDViewSet(BaseCRUDViewSet):
     write_serializer_class = LabelCreateSerializer
     
     http_method_names = ["get", "post", "delete"]
+    
+    lookup_field = "number"
+    lookup_url_kwarg = "number"
 
     def perform_destroy(self, instance):
         instance.soft_delete()

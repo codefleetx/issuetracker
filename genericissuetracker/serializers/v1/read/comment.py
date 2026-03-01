@@ -29,6 +29,7 @@ class IssueCommentReadSerializer(serializers.ModelSerializer):
         model = IssueComment
         fields = [
             "id",
+            "number",
             "issue",
             "body",
             "commenter_email",

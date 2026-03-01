@@ -39,7 +39,8 @@ Designed to support:
 
 import os
 
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Max
 
 from .base import BaseModel
 
@@ -77,6 +78,16 @@ class IssueAttachment(BaseModel):
         db_index=True,
         help_text="Issue this attachment belongs to.",
     )
+    
+    # ------------------------------------------------------------------
+    # PUBLIC IDENTIFIER
+    # ------------------------------------------------------------------
+    number = models.BigIntegerField(
+        unique=True,
+        db_index=True,
+        editable=False,
+        help_text="Sequential human-friendly identifier for this attachment.",
+    )
 
     # ------------------------------------------------------------------
     # FILE STORAGE
@@ -110,12 +121,22 @@ class IssueAttachment(BaseModel):
     # ------------------------------------------------------------------
     def save(self, *args, **kwargs):
         """
-        Automatically populate original_name and size
+        Automatically populate number, original_name and size
         when file is first saved.
 
         This keeps metadata consistent without adding
         business logic to serializers.
         """
+        if self.number is None:
+            with transaction.atomic():
+                last_number = (
+                    IssueAttachment.all_objects.aggregate(
+                        max_number=Max("number")
+                    )["max_number"]
+                    or 0
+                )
+                self.number = last_number + 1
+
         if self.file:
             if not self.original_name:
                 self.original_name = os.path.basename(self.file.name)
@@ -124,7 +145,6 @@ class IssueAttachment(BaseModel):
                 try:
                     self.size = self.file.size
                 except Exception:
-                    # Storage backend may defer size resolution
                     self.size = 0
 
         super().save(*args, **kwargs)

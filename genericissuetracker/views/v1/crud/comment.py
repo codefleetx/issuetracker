@@ -50,6 +50,9 @@ class CommentCRUDViewSet(BaseCRUDViewSet):
     write_serializer_class = IssueCommentCreateSerializer
     
     http_method_names = ["get", "post", "delete"]
+    
+    lookup_field = "number"
+    lookup_url_kwarg = "number"
 
     def perform_destroy(self, instance):
         instance.soft_delete()

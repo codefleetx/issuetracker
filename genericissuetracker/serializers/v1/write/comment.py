@@ -42,8 +42,19 @@ class IssueCommentCreateSerializer(serializers.ModelSerializer):
         )
 
         allow_anonymous = get_setting("ALLOW_ANONYMOUS_REPORTING")
+        max_length = get_setting("MAX_COMMENT_LENGTH")
 
         attrs.pop("commenter_user_id", None)
+
+        # ----------------------------------------------------------
+        # COMMENT LENGTH ENFORCEMENT (v0.5.2)
+        # ----------------------------------------------------------
+        body = attrs.get("body", "")
+
+        if len(body) > max_length:
+            raise serializers.ValidationError(
+                {"body": f"Comment cannot exceed {max_length} characters."}
+            )
 
         if identity["is_authenticated"]:
             attrs["commenter_user_id"] = identity["id"]

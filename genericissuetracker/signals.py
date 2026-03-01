@@ -107,3 +107,25 @@ Kwargs:
     issue: Issue instance
     identity: dict containing identity resolution result
 """
+
+
+attachment_added = Signal()
+"""
+Dispatched after an attachment is successfully uploaded.
+
+Kwargs:
+    issue: Issue instance
+    attachment: IssueAttachment instance
+    identity: dict
+"""
+
+
+attachment_deleted = Signal()
+"""
+Dispatched after an attachment is soft deleted.
+
+Kwargs:
+    issue: Issue instance
+    attachment: IssueAttachment instance
+    identity: dict
+"""
