@@ -5,6 +5,31 @@ All notable changes to this project will be documented here.
 This project follows Semantic Versioning.
 
 ---
+## [0.5.2] - 2026-03-01
+
+### Added
+- Sequential public `number` field for:
+  - IssueComment
+  - IssueAttachment
+  - Label
+- Attachment lifecycle signals:
+  - attachment_added
+  - attachment_deleted
+- MAX_COMMENT_LENGTH setting (default: 10,000)
+
+### Changed
+- API routing now resolves by `number` instead of UUID for:
+  - comments
+  - attachments
+  - labels
+- Comment body now enforces database-level max_length=10000
+
+### Migration Notes
+- Two-step migration for numeric identifiers
+- UUID primary keys remain unchanged
+- UUID-based URLs are no longer supported
+
+---
 
 ## [0.5.0] - 2026-02-21
 
