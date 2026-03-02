@@ -23,8 +23,8 @@ Design Rules
 from django.db import transaction
 from rest_framework import serializers
 
-from genericissuetracker.models.issue import Issue
 from genericissuetracker.models.attachment import IssueAttachment
+from genericissuetracker.models.issue import Issue
 from genericissuetracker.serializers.base.issue import BaseIssueWriteSerializer
 from genericissuetracker.services.identity import get_identity_resolver
 from genericissuetracker.settings import get_setting
