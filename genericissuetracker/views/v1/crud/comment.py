@@ -4,12 +4,18 @@ genericissuetracker.views.v1.crud.comment
 
 Version 1 CRUD endpoints for IssueComment.
 
+- Supports atomic comment + attachment creation via multipart/form-data.
+
 Exposes:
     • POST   /api/v1/comments/
     • DELETE /api/v1/comments/{id}/
 """
 
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import (
+    OpenApiExample,
+    extend_schema,
+    extend_schema_view,
+)
 
 from genericissuetracker.models import IssueComment
 from genericissuetracker.serializers.v1.read.comment import (
@@ -35,7 +41,26 @@ from genericissuetracker.views.v1.base import BaseCRUDViewSet
     create=extend_schema(
         operation_id="comment_create",
         tags=["Comment"],
-        summary="Create comment",
+        summary="Create comment (supports atomic file upload)",
+        description=(
+            "Creates a new comment.\n\n"
+            "Supports atomic comment + attachment creation when "
+            "submitted as multipart/form-data.\n\n"
+            "If any attachment fails validation, the entire "
+            "transaction is rolled back."
+        ),
+        examples=[
+            OpenApiExample(
+                "Multipart Comment With Attachments",
+                summary="Create comment with files",
+                description="Atomic comment + attachment creation.",
+                value={
+                    "issue": 15,
+                    "body": "Here are the logs.",
+                    "files": ["error.log", "trace.txt"],
+                },
+            )
+        ],
     ),
     destroy=extend_schema(
         operation_id="comment_delete",

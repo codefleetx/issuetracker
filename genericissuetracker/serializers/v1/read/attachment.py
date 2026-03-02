@@ -25,9 +25,12 @@ class IssueAttachmentReadSerializer(serializers.ModelSerializer):
             "id",
             "number",
             "issue",
+            "comment",
             "file",
             "original_name",
             "size",
+            "uploaded_by_user_id",
+            "uploaded_by_email",
             "created_at",
             "updated_at",
         ]

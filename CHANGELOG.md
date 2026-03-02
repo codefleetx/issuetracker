@@ -5,6 +5,42 @@ All notable changes to this project will be documented here.
 This project follows Semantic Versioning.
 
 ---
+
+## [0.5.3] - 2026-03-02
+
+### Added
+
+* Comment-linked attachments (optional `comment` FK on `IssueAttachment`)
+* Uploader identity tracking (`uploaded_by_user_id`, `uploaded_by_email`)
+* Atomic comment + attachment creation via multipart/form-data
+* Serializer-level issue/comment consistency validation
+* Comment-aware `attachment_added` signal payload
+* Support for referencing `Issue` via `issue_number` instead of UUID in write endpoints
+
+### Changed
+
+* Comment create endpoint now accepts optional `files[]`
+* Attachment upload automatically injects uploader identity
+* Write serializers now resolve `Issue` using `issue_number` (numeric) instead of UUID
+* OpenAPI schema updated for multipart support
+
+### Migration Notes
+
+* Staged migration for new attachment fields:
+
+  1. Add nullable fields
+  2. Backfill historical rows
+  3. Enforce NOT NULL on `uploaded_by_email`
+
+### Backward Compatibility
+
+* No endpoint removed
+* UUID primary keys unchanged
+* Numeric public identifiers unchanged
+* Existing integrations remain functional
+
+---
+
 ## [0.5.2] - 2026-03-01
 
 ### Added
