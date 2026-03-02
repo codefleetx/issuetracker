@@ -1113,7 +1113,11 @@ components:
         Serializer for creating new issues.
 
         Exposes reporter_email only for anonymous users.
-        Authenticated identity is inhjected automatically.
+        Authenticated identity is injected automatically.
+
+        v0.6.0
+        ------
+        Supports atomic issue creation with optional attachments.
       properties:
         issue_number:
           type: integer
@@ -1154,6 +1158,13 @@ components:
           type: string
           format: email
           description: Required for anonymous users.
+        files:
+          type: array
+          items:
+            type: string
+            format: uri
+          writeOnly: true
+          description: Optional files to attach during issue creation.
       required:
       - description
       - issue_number
