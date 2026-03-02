@@ -6,6 +6,27 @@ This project follows Semantic Versioning.
 
 ---
 
+## [0.6.0] - 2026-03-02
+
+### ✨ Added
+- Atomic issue creation with attachments (API v1).
+- `files` field added to IssueCreateSerializer (optional).
+- Attachments can now be uploaded during issue creation using multipart/form-data.
+- Attachments validated using existing MAX_ATTACHMENTS and MAX_ATTACHMENT_SIZE_MB settings.
+- attachment_added signal emitted per uploaded file.
+
+### 🔒 Improved
+- Issue + attachments creation wrapped in transaction.atomic().
+- Strict anti-spoofing identity enforcement preserved.
+
+### 🧪 Behavior
+- Fully backward compatible.
+- No database migrations required.
+- No breaking API changes.
+- Deterministic OpenAPI schema maintained.
+
+---
+
 ## [0.5.3] - 2026-03-02
 
 ### Added
