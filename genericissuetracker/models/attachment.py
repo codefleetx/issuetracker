@@ -11,6 +11,10 @@ Design Goals
 - No direct dependency on any specific file storage system.
 - Validation of size and count handled in serializer layer.
 - Secure upload path structure.
+- Attachments may optionally belong to a comment.
+- Uploader identity is stored explicitly.
+- Comment/Issue consistency enforced at serializer layer.
+
 
 Security Considerations
 -----------------------
@@ -79,6 +83,15 @@ class IssueAttachment(BaseModel):
         help_text="Issue this attachment belongs to.",
     )
     
+    comment = models.ForeignKey(
+        "IssueComment",
+        null=True,
+        blank=True,
+        related_name="attachments",
+        on_delete=models.CASCADE,
+        help_text="Optional comment this attachment belongs to.",
+    )
+    
     # ------------------------------------------------------------------
     # PUBLIC IDENTIFIER
     # ------------------------------------------------------------------
@@ -105,6 +118,20 @@ class IssueAttachment(BaseModel):
     size = models.PositiveBigIntegerField(
         help_text="File size in bytes.",
     )
+    
+    # ------------------------------------------------------------------
+    # UPLOADER IDENTITY (v0.5.3)
+    # ------------------------------------------------------------------
+    uploaded_by_user_id = models.IntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Optional user ID from host application identity system.",
+    )
+
+    uploaded_by_email = models.EmailField(
+        help_text="Email address of the uploader.",
+    )
 
     # ------------------------------------------------------------------
     # META
@@ -113,7 +140,9 @@ class IssueAttachment(BaseModel):
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["issue"]),
+            models.Index(fields=["comment"]),
             models.Index(fields=["created_at"]),
+            models.Index(fields=["uploaded_by_user_id"]),
         ]
 
     # ------------------------------------------------------------------

@@ -3,6 +3,8 @@ genericissuetracker.views.v1.crud.attachment
 ============================================
 
 Version 1 CRUD endpoints for IssueAttachment.
+- Supports optional comment-level attachment association.
+- Uploader identity automatically injected.
 
 Exposes:
     • POST   /api/v1/attachments/
@@ -41,6 +43,11 @@ from genericissuetracker.views.v1.base import BaseCRUDViewSet
         operation_id="attachment_create",
         tags=["Attachment"],
         summary="Upload attachment",
+        description=(
+            "Uploads a file attachment.\n\n"
+            "Attachment may optionally belong to a specific comment.\n"
+            "Uploader identity is automatically injected."
+        ),
     ),
     destroy=extend_schema(
         operation_id="attachment_delete",
@@ -75,6 +82,7 @@ class AttachmentCRUDViewSet(BaseCRUDViewSet):
             issue=instance.issue,
             attachment=instance,
             identity=identity,
+            comment=instance.comment,
         )
 
     def perform_destroy(self, instance):

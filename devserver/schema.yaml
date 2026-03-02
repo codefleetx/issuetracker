@@ -31,12 +31,10 @@ paths:
     post:
       operationId: attachment_create
       description: |-
-        Base class for write-capable endpoints.
+        Uploads a file attachment.
 
-        Requirements:
-            - Must define `read_serializer_class`
-            - Must define `write_serializer_class`
-            - Must define `queryset`
+        Attachment may optionally belong to a specific comment.
+        Uploader identity is automatically injected.
       summary: Upload attachment
       tags:
       - Attachment
@@ -198,13 +196,12 @@ paths:
     post:
       operationId: comment_create
       description: |-
-        Base class for write-capable endpoints.
+        Creates a new comment.
 
-        Requirements:
-            - Must define `read_serializer_class`
-            - Must define `write_serializer_class`
-            - Must define `queryset`
-      summary: Create comment
+        Supports atomic comment + attachment creation when submitted as multipart/form-data.
+
+        If any attachment fails validation, the entire transaction is rolled back.
+      summary: Create comment (supports atomic file upload)
       tags:
       - Comment
       requestBody:
@@ -212,6 +209,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IssueCommentCreate'
+            examples:
+              MultipartCommentWithAttachments:
+                value:
+                  issue: 15
+                  body: Here are the logs.
+                  files:
+                  - error.log
+                  - trace.txt
+                summary: Create comment with files
+                description: Atomic comment + attachment creation.
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/IssueCommentCreate'
@@ -228,6 +235,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IssueCommentCreate'
+              examples:
+                MultipartCommentWithAttachments:
+                  value:
+                    issue: 15
+                    body: Here are the logs.
+                    files:
+                    - error.log
+                    - trace.txt
+                  summary: Create comment with files
+                  description: Atomic comment + attachment creation.
           description: ''
   /api/v1/comments-read/:
     get:
@@ -944,6 +961,12 @@ components:
           format: uuid
           description: Issue this attachment belongs to.
           readOnly: true
+        comment:
+          type: string
+          format: uuid
+          description: Optional comment this attachment belongs to.
+          readOnly: true
+          nullable: true
         file:
           type: string
           format: uri
@@ -957,6 +980,16 @@ components:
           type: integer
           readOnly: true
           description: File size in bytes.
+        uploaded_by_user_id:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: Optional user ID from host application identity system.
+        uploaded_by_email:
+          type: string
+          format: email
+          readOnly: true
+          description: Email address of the uploader.
         created_at:
           type: string
           format: date-time
@@ -968,6 +1001,7 @@ components:
           readOnly: true
           description: Timestamp when this record was last updated.
       required:
+      - comment
       - created_at
       - file
       - id
@@ -976,14 +1010,20 @@ components:
       - original_name
       - size
       - updated_at
+      - uploaded_by_email
+      - uploaded_by_user_id
     IssueAttachmentUpload:
       type: object
       description: Serializer for uploading attachments.
       properties:
         issue:
+          type: integer
+          description: Issue number (not UUID).
+        comment:
           type: string
           format: uuid
-          description: Issue this attachment belongs to.
+          description: Optional comment this attachment belongs to.
+          nullable: true
         file:
           type: string
           format: uri
@@ -996,9 +1036,8 @@ components:
       description: Serializer for creating new comments.
       properties:
         issue:
-          type: string
-          format: uuid
-          description: The issue this comment belongs to.
+          type: integer
+          description: Issue number (not UUID).
         body:
           type: string
           description: Comment content in markdown or plain text.
@@ -1007,6 +1046,13 @@ components:
           type: string
           format: email
           description: Required for anonymous users.
+        files:
+          type: array
+          items:
+            type: string
+            format: uri
+          writeOnly: true
+          description: Optional files to attach to this comment.
       required:
       - body
       - issue

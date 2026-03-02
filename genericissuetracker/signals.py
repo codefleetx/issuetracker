@@ -117,6 +117,7 @@ Kwargs:
     issue: Issue instance
     attachment: IssueAttachment instance
     identity: dict
+    attachment: IssueAttachment instance
 """
 
 
