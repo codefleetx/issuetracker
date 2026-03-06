@@ -6,6 +6,41 @@ This project follows Semantic Versioning.
 
 ---
 
+## [0.6.1] - 2026-03-06
+
+### Timeline Ready Issue Status History
+
+### Added
+- `event_type` field in `IssueStatusHistory` for machine-readable lifecycle event classification
+- `metadata` JSON field allowing structured contextual data for lifecycle transitions
+- Composite index `(issue, created_at)` optimized for timeline queries
+
+### Changed
+- `change_issue_status()` lifecycle service now accepts optional parameters:
+  - `event_type`
+  - `metadata`
+- Status history events now support extensible event semantics while preserving existing lifecycle behavior
+
+### Improvements
+- `IssueStatusHistory` now acts as a timeline-ready lifecycle event store
+- Enables integrations, automation triggers, and analytics pipelines without requiring future schema migrations
+- Optimized database performance for issue timeline queries
+
+### Compatibility
+- Fully backward compatible
+- Existing events automatically behave as:
+  - `event_type = "status_changed"`
+  - `metadata = {}`
+
+### Migration Notes
+- Migration adds two fields to `IssueStatusHistory`:
+  - `event_type`
+  - `metadata`
+- Adds composite index `(issue, created_at)`
+- No data migration required
+
+---
+
 ## [0.6.0] - 2026-03-02
 
 ### ✨ Added

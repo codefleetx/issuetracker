@@ -7,7 +7,17 @@ from genericissuetracker.models.issue import IssueStatus
 class IssueStatusHistory(BaseModel):
     """
     Tracks lifecycle transitions for Issue.
-    Industry standard audit trail.
+
+    This model acts as a timeline-ready event store for issue lifecycle events.
+    It records status transitions and allows attaching structured metadata
+    for integrations, automation, and analytics.
+
+    Design Principles
+    -----------------
+    • Library-safe (no auth dependency)
+    • Timeline friendly
+    • Extensible via metadata JSON
+    • Explicit event classification
     """
 
     issue = models.ForeignKey(
@@ -37,12 +47,29 @@ class IssueStatusHistory(BaseModel):
         null=True,
         blank=True,
     )
+    
+    # Event Classification
+    event_type = models.CharField(
+        max_length=32,
+        default="status_changed",
+        db_index=True,
+        help_text="Machine readable event classification.",
+    )
+
+    # Extensible Metadata
+    metadata = models.JSONField(
+        null=True,
+        blank=True,
+        default=dict,
+        help_text="Optional structured metadata for integrations and automation.",
+    )
 
     class Meta:
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["issue"]),
             models.Index(fields=["created_at"]),
+            models.Index(fields=["issue", "created_at"]),
         ]
 
     def __str__(self):
