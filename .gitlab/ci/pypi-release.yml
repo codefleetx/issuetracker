@@ -1,0 +1,98 @@
+# issuetracker — PyPI Release Pipeline
+# Manually triggered only via GitLab UI → CI/CD → Run pipeline
+# Stages: test → build → publish
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'   # manual trigger only
+
+stages:
+  - test
+  - build
+  - publish
+
+# ─────────────────────────────────────────
+# TEST
+# ─────────────────────────────────────────
+test:
+  stage: test
+  image: python:3.11
+
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+  cache:
+    key: pip-issuetracker-$CI_COMMIT_REF_SLUG
+    paths:
+      - .cache/pip
+
+  before_script:
+    - pip install -e ".[dev]"
+
+  script:
+    - ruff check .
+    - pytest --tb=short
+
+# ─────────────────────────────────────────
+# BUILD
+# ─────────────────────────────────────────
+build:
+  stage: build
+  image: python:3.11
+  needs: [test]
+
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+  cache:
+    key: pip-issuetracker-$CI_COMMIT_REF_SLUG
+    paths:
+      - .cache/pip
+
+  before_script:
+    - pip install build
+
+  script:
+    - python -m build
+    - echo "Built packages:"
+    - ls -la dist/
+
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - dist/
+
+# ─────────────────────────────────────────
+# PUBLISH
+# ─────────────────────────────────────────
+publish:
+  stage: publish
+  image: python:3.11
+  needs: [build]
+
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+  cache:
+    key: pip-issuetracker-$CI_COMMIT_REF_SLUG
+    paths:
+      - .cache/pip
+
+  before_script:
+    - pip install twine
+
+  script:
+    - echo "Publishing genericissuetracker to PyPI..."
+    - twine upload dist/* --non-interactive
+    - echo "✅ Published successfully!"
+
+  environment:
+    name: pypi
+    url: https://pypi.org/project/genericissuetracker/
+
+  # PYPI_USERNAME and PYPI_PASSWORD must be set in:
+  # GitLab → Settings → CI/CD → Variables
+  # Use __token__ as username and your PyPI API token as password
+  variables:
+    TWINE_USERNAME: $PYPI_USERNAME
+    TWINE_PASSWORD: $PYPI_PASSWORD
