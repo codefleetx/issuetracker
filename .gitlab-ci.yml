@@ -1,3 +1,17 @@
+# issuetracker — Root GitLab CI
+# Includes only the PyPI release pipeline.
+# Trigger: manual only, on main branch.
+# Run via: GitLab → CI/CD → Run pipeline → select main
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "main"'
+
+stages:
+  - test
+  - build
+  - version-check
+  - publish
+
 include:
-  - local: '.gitlab/ci/ci.yml'
   - local: '.gitlab/ci/pypi-release.yml'
