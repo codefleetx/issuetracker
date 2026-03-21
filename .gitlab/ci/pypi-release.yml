@@ -1,14 +1,15 @@
 # issuetracker — PyPI Release Pipeline
-# Manually triggered only via GitLab UI → CI/CD → Run pipeline
-# Stages: test → build → publish
+# Manually triggered only via GitLab UI → CI/CD → Run pipeline on main branch
+# Stages: test → build → version-check → publish
 
 workflow:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web"'   # manual trigger only
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "main"'
 
 stages:
   - test
   - build
+  - version-check
   - publish
 
 # ─────────────────────────────────────────
@@ -50,7 +51,7 @@ build:
       - .cache/pip
 
   before_script:
-    - pip install build
+    - pip install build --quiet
 
   script:
     - python -m build
@@ -63,36 +64,87 @@ build:
       - dist/
 
 # ─────────────────────────────────────────
+# VERSION CHECK
+# 1. Reads version from pyproject.toml
+# 2. Validates semver format (MAJOR.MINOR.PATCH)
+# 3. Compares against latest PyPI version
+# 4. Blocks publish if format invalid or
+#    version already published on PyPI
+# ─────────────────────────────────────────
+version-check:
+  stage: version-check
+  image: python:3.11
+  needs: [build]
+
+  script:
+    - |
+      python3 -c "
+      import sys, re, urllib.request, json
+
+      PACKAGE = 'genericissuetracker'
+
+      # Step 1: Read local version
+      with open('pyproject.toml') as f:
+          content = f.read()
+      match = re.search(r'^version\s*=\s*\"([^\"]+)\"', content, re.MULTILINE)
+      if not match:
+          print('❌ Could not find version in pyproject.toml')
+          sys.exit(1)
+      v = match.group(1)
+      print(f'  Local version:  {v}')
+
+      # Step 2: Validate semver format
+      # Accepts: 1.2.3 | 1.2.3a1 | 1.2.3b2 | 1.2.3rc1 | 1.2.3.post1 | 1.2.3.dev0
+      # Rejects: v1.2.3 | 1.2 | 1.2. | 1.2.3.4 | abc
+      pattern = r'^\d+\.\d+\.\d+(\.?(post|dev)\d+)?((a|b|rc)\d+)?$'
+      if not re.match(pattern, v):
+          print(f'\n❌ Version \"{v}\" is not valid semver.')
+          print('   Expected: MAJOR.MINOR.PATCH  e.g. 1.2.3')
+          print('   Also OK:  1.2.3a1  1.2.3b2  1.2.3rc1  1.2.3.post1  1.2.3.dev0')
+          print('   Invalid:  v1.2.3   1.2   1.2.   1.2.3.4')
+          sys.exit(1)
+      print('  Format:         valid semver')
+
+      # Step 3: Fetch PyPI version
+      try:
+          with urllib.request.urlopen(f'https://pypi.org/pypi/{PACKAGE}/json', timeout=10) as r:
+              pypi_v = json.load(r)['info']['version']
+          print(f'  PyPI version:   {pypi_v}')
+      except Exception as e:
+          print(f'Could not reach PyPI: {e} - proceeding anyway')
+          sys.exit(0)
+
+      # Step 4: Block if already published
+      if v == pypi_v:
+          print(f'Version {v} is already on PyPI. Bump version before publishing.')
+          sys.exit(1)
+
+      print(f'Version {v} is new - safe to publish.')
+      "
+
+# ─────────────────────────────────────────
 # PUBLISH
+# PYPI_USERNAME = __token__
+# PYPI_PASSWORD = PyPI API token (Masked)
+# Set in: GitLab → Settings → CI/CD → Variables
 # ─────────────────────────────────────────
 publish:
   stage: publish
   image: python:3.11
-  needs: [build]
+  needs: [version-check]
 
   variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-  cache:
-    key: pip-issuetracker-$CI_COMMIT_REF_SLUG
-    paths:
-      - .cache/pip
+    TWINE_USERNAME: $PYPI_USERNAME
+    TWINE_PASSWORD: $PYPI_PASSWORD
 
   before_script:
-    - pip install twine
+    - pip install twine --quiet
 
   script:
     - echo "Publishing genericissuetracker to PyPI..."
     - twine upload dist/* --non-interactive
-    - echo "✅ Published successfully!"
+    - echo "Published successfully!"
 
   environment:
     name: pypi
     url: https://pypi.org/project/genericissuetracker/
-
-  # PYPI_USERNAME and PYPI_PASSWORD must be set in:
-  # GitLab → Settings → CI/CD → Variables
-  # Use __token__ as username and your PyPI API token as password
-  variables:
-    TWINE_USERNAME: $PYPI_USERNAME
-    TWINE_PASSWORD: $PYPI_PASSWORD
