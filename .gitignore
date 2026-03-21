@@ -213,3 +213,4 @@ devserver/issues/.DS_Store
 consolidated_files.py
 .venv/
 genericissuetracker.egg-info/
+devserver/issues/
