@@ -12,6 +12,8 @@ stages:
   - build
   - version-check
   - publish
+  - trigger
 
 include:
-  - local: '.gitlab/ci/pypi-release.yml'  - local: '.gitlab/ci/github-mirror.yml'
+  - local: '.gitlab/ci/pypi-release.yml'
+  - local: '.gitlab/ci/github-mirror.yml'
