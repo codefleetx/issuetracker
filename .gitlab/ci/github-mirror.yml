@@ -22,3 +22,5 @@ trigger_github_mirror:
 
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
