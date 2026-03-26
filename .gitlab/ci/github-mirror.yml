@@ -1,6 +1,6 @@
 # github-mirror.yml
 # Triggers GitHub Actions mirror workflow on every merge to main.
-# GitHub clones this GitLab repo and force-pushes to vbgiyor/issuetracker.
+# GitHub clones this GitLab repo and force-pushes to codefleetx/issuetracker.
 # GH_TOKEN must be set in GitLab CI/CD variables for this repo.
 
 trigger_github_mirror:
@@ -16,7 +16,7 @@ trigger_github_mirror:
       curl -s -X POST \
         -H "Accept: application/vnd.github+json" \
         -H "Authorization: token $GH_TOKEN" \
-        https://api.github.com/repos/vbgiyor/issuetracker/dispatches \
+        https://api.github.com/repos/codefleetx/issuetracker/dispatches \
         -d '{"event_type": "gitlab-push"}'
     - echo "✅ Mirror trigger sent"
 
