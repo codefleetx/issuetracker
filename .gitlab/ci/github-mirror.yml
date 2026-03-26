@@ -1,4 +1,3 @@
-# github-mirror.yml
 # Triggers GitHub Actions mirror workflow on every merge to main.
 # GitHub clones this GitLab repo and force-pushes to vbgiyor/issuetracker.
 # GH_TOKEN must be set in GitLab CI/CD variables for this repo.
